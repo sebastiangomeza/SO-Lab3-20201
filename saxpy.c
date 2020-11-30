@@ -22,7 +22,7 @@
 // Variables to obtain command line parameters
 unsigned int seed = 1;
 int p = 10000000;
-int n_threads = 2;
+int n_threads = 8;
 int max_iters = 1000;
 // Variables to perform SAXPY operation
 double *X;
@@ -36,28 +36,99 @@ double exec_time;
 
 void *calcular(void *arg)
 {
-	for (it = 0; it < max_iters; it++)
+	char *is;
+	is = (char *)arg;
+	int its = is[0] - 48;
+	
+	for (its = its; its < max_iters; its = its + n_threads)
 	{
 		for (i = 0; i < p; i++)
 		{
 			Y[i] = Y[i] + a * X[i];
-			Y_avgs[it] += Y[i];
+			Y_avgs[its] += Y[i];
 		}
-		Y_avgs[it] = Y_avgs[it] / p;
+		Y_avgs[its] = Y_avgs[its] / p;
 	}
+	return NULL;
+}
+void *oneThreads(void *arg)
+{
+	char *var1 = "0";
+	pthread_t h1;
+	pthread_create(&h1, NULL, calcular, (void *)var1);
+	pthread_join(h1, NULL);
 	return NULL;
 }
 
 void *twoThreads(void *arg)
 {
+	char *var1 = "0";
+	char *var2 = "1";
 	pthread_t h1;
 	pthread_t h2;
-	pthread_create(&h1, NULL, calcular, NULL);
-	pthread_create(&h2, NULL, calcular, NULL);
+	pthread_create(&h1, NULL, calcular, (void *)var1);
+	pthread_create(&h2, NULL, calcular, (void *)var2);
 	pthread_join(h1, NULL);
 	pthread_join(h2, NULL);
 	return NULL;
+}
 
+void *fourThreads(void *arg)
+{
+	char *var1 = "0";
+	char *var2 = "1";
+	char *var3 = "2";
+	char *var4 = "3";
+	pthread_t h1;
+	pthread_t h2;
+	pthread_t h3;
+	pthread_t h4;
+	pthread_create(&h1, NULL, calcular, (void *)var1);
+	pthread_create(&h2, NULL, calcular, (void *)var2);
+	pthread_create(&h3, NULL, calcular, (void *)var3);
+	pthread_create(&h4, NULL, calcular, (void *)var4);
+	pthread_join(h1, NULL);
+	pthread_join(h2, NULL);
+	pthread_join(h3, NULL);
+	pthread_join(h4, NULL);
+	return NULL;
+}
+
+void *eightThreads(void *arg)
+{
+	char *var1 = "0";
+	char *var2 = "1";
+	char *var3 = "2";
+	char *var4 = "3";
+	char *var5 = "4";
+	char *var6 = "5";
+	char *var7 = "6";
+	char *var8 = "7";
+	pthread_t h1;
+	pthread_t h2;
+	pthread_t h3;
+	pthread_t h4;
+	pthread_t h5;
+	pthread_t h6;
+	pthread_t h7;
+	pthread_t h8;
+	pthread_create(&h1, NULL, calcular, (void *)var1);
+	pthread_create(&h2, NULL, calcular, (void *)var2);
+	pthread_create(&h3, NULL, calcular, (void *)var3);
+	pthread_create(&h4, NULL, calcular, (void *)var4);
+	pthread_create(&h5, NULL, calcular, (void *)var5);
+	pthread_create(&h6, NULL, calcular, (void *)var6);
+	pthread_create(&h7, NULL, calcular, (void *)var7);
+	pthread_create(&h8, NULL, calcular, (void *)var8);
+	pthread_join(h1, NULL);
+	pthread_join(h2, NULL);
+	pthread_join(h3, NULL);
+	pthread_join(h4, NULL);
+	pthread_join(h5, NULL);
+	pthread_join(h6, NULL);
+	pthread_join(h7, NULL);
+	pthread_join(h8, NULL);
+	return NULL;
 }
 
 int main(int argc, char *argv[])
@@ -140,7 +211,27 @@ int main(int argc, char *argv[])
 	//SAXPY iterative SAXPY mfunction
 
 	//hilos aca
-	twoThreads(NULL);
+	switch (n_threads)
+	{
+	case 1:
+		oneThreads(NULL);
+		/* code */
+		break;
+	case 2:
+		twoThreads(NULL);
+		/* code */
+		break;
+	case 4:
+		fourThreads(NULL);
+		/* code */
+		break;
+	case 8:
+		eightThreads(NULL);
+		/* code */
+		break;
+	default:
+		break;
+	}
 
 	// hilos finaliza
 
