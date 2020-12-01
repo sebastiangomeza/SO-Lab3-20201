@@ -18,11 +18,12 @@
 #include <assert.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <semaphore.h>
 
 // Variables to obtain command line parameters
 unsigned int seed = 1;
 int p = 10000000;
-int n_threads = 8;
+int n_threads = 2;
 int max_iters = 1000;
 // Variables to perform SAXPY operation
 double *X;
@@ -34,20 +35,28 @@ int i, it;
 struct timeval t_start, t_end;
 double exec_time;
 
+sem_t mutex;
+
 void *calcular(void *arg)
 {
 	char *is;
 	is = (char *)arg;
 	int its = is[0] - 48;
+	int l;
+	//double acc = 0;
 	
-	for (its = its; its < max_iters; its = its + n_threads)
+	for (l = 0; l < max_iters; l++)
 	{
-		for (i = 0; i < p; i++)
+		for (i = its; i < p; i = i + n_threads)
 		{
 			Y[i] = Y[i] + a * X[i];
-			Y_avgs[its] += Y[i];
+			//acc += Y[i];
+			Y_avgs[l] += Y[i];
 		}
-		Y_avgs[its] = Y_avgs[its] / p;
+		Y_avgs[l] = Y_avgs[l] / p;
+		//sem_wait(&mutex);
+		//Y_avgs[l] += acc / p;
+		//sem_post(&mutex);
 	}
 	return NULL;
 }
@@ -64,6 +73,7 @@ void *twoThreads(void *arg)
 {
 	char *var1 = "0";
 	char *var2 = "1";
+	sem_init(&mutex, 0, 1);
 	pthread_t h1;
 	pthread_t h2;
 	pthread_create(&h1, NULL, calcular, (void *)var1);
