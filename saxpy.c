@@ -23,7 +23,7 @@
 // Variables to obtain command line parameters
 unsigned int seed = 1;
 int p = 10000000;
-int n_threads = 2;
+int n_threads = 1;
 int max_iters = 1000;
 // Variables to perform SAXPY operation
 double *X;
@@ -43,20 +43,22 @@ void *calcular(void *arg)
 	is = (char *)arg;
 	int its = is[0] - 48;
 	int l;
-	//double acc = 0;
+	double acc = 0;
+	//double acc2 = 0;
 	
 	for (l = 0; l < max_iters; l++)
 	{
 		for (i = its; i < p; i = i + n_threads)
 		{
 			Y[i] = Y[i] + a * X[i];
-			//acc += Y[i];
-			Y_avgs[l] += Y[i];
+			acc += Y[i];
+			//Y_avgs[l] += Y[i];
 		}
-		Y_avgs[l] = Y_avgs[l] / p;
-		//sem_wait(&mutex);
-		//Y_avgs[l] += acc / p;
-		//sem_post(&mutex);
+		//Y_avgs[l] = Y_avgs[l] / p;
+		sem_wait(&mutex);
+		//acc2 += acc / p;
+		Y_avgs[l] += acc / p;
+		sem_post(&mutex);
 	}
 	return NULL;
 }
@@ -64,6 +66,7 @@ void *oneThreads(void *arg)
 {
 	char *var1 = "0";
 	pthread_t h1;
+	sem_init(&mutex, 0, 1);
 	pthread_create(&h1, NULL, calcular, (void *)var1);
 	pthread_join(h1, NULL);
 	return NULL;
@@ -89,6 +92,7 @@ void *fourThreads(void *arg)
 	char *var2 = "1";
 	char *var3 = "2";
 	char *var4 = "3";
+	sem_init(&mutex, 0, 1);
 	pthread_t h1;
 	pthread_t h2;
 	pthread_t h3;
