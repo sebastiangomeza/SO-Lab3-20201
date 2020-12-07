@@ -23,7 +23,7 @@
 // Variables to obtain command line parameters
 unsigned int seed = 1;
 int p = 10000000;
-int n_threads = 1;
+int n_threads = 8;
 int max_iters = 1000;
 // Variables to perform SAXPY operation
 double *X;
@@ -43,21 +43,19 @@ void *calcular(void *arg)
 	is = (char *)arg;
 	int its = is[0] - 48;
 	int l;
-	double acc = 0;
+	double acc;
 	//double acc2 = 0;
 	
 	for (l = 0; l < max_iters; l++)
 	{
+		acc = 0;
 		for (i = its; i < p; i = i + n_threads)
 		{
 			Y[i] = Y[i] + a * X[i];
 			acc += Y[i];
-			//Y_avgs[l] += Y[i];
 		}
-		//Y_avgs[l] = Y_avgs[l] / p;
 		sem_wait(&mutex);
-		//acc2 += acc / p;
-		Y_avgs[l] += acc / p;
+		Y_avgs[l] += acc / p;	
 		sem_post(&mutex);
 	}
 	return NULL;
@@ -118,6 +116,7 @@ void *eightThreads(void *arg)
 	char *var6 = "5";
 	char *var7 = "6";
 	char *var8 = "7";
+	sem_init(&mutex, 0, 1);
 	pthread_t h1;
 	pthread_t h2;
 	pthread_t h3;
