@@ -64,7 +64,6 @@ void *oneThreads(void *arg)
 {
 	char *var1 = "0";
 	pthread_t h1;
-	sem_init(&mutex, 0, 1);
 	pthread_create(&h1, NULL, calcular, (void *)var1);
 	pthread_join(h1, NULL);
 	return NULL;
@@ -74,7 +73,6 @@ void *twoThreads(void *arg)
 {
 	char *var1 = "0";
 	char *var2 = "1";
-	sem_init(&mutex, 0, 1);
 	pthread_t h1;
 	pthread_t h2;
 	pthread_create(&h1, NULL, calcular, (void *)var1);
@@ -90,7 +88,6 @@ void *fourThreads(void *arg)
 	char *var2 = "1";
 	char *var3 = "2";
 	char *var4 = "3";
-	sem_init(&mutex, 0, 1);
 	pthread_t h1;
 	pthread_t h2;
 	pthread_t h3;
@@ -116,7 +113,6 @@ void *eightThreads(void *arg)
 	char *var6 = "5";
 	char *var7 = "6";
 	char *var8 = "7";
-	sem_init(&mutex, 0, 1);
 	pthread_t h1;
 	pthread_t h2;
 	pthread_t h3;
@@ -224,6 +220,7 @@ int main(int argc, char *argv[])
 	//SAXPY iterative SAXPY mfunction
 
 	//hilos aca
+	sem_init(&mutex, 0, 1);
 	switch (n_threads)
 	{
 	case 1:
