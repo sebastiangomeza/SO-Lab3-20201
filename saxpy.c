@@ -71,7 +71,7 @@ void *oneThreads(void *arg)
 {
 	param_t param1;
 	param1.ini = 0;
-	param1.end = p / 1;
+	param1.end = p ;
 	pthread_t h1;
 	pthread_create(&h1, NULL, calcular, &param1);
 	pthread_join(h1, NULL);
