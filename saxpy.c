@@ -35,48 +35,61 @@ int i, it;
 struct timeval t_start, t_end;
 double exec_time;
 
+typedef struct _param
+{
+	int ini;
+	int end;
+} param_t;
+
 sem_t mutex;
 
 void *calcular(void *arg)
 {
-	char *is;
-	is = (char *)arg;
-	int its = is[0] - 48;
+
 	int l;
 	double acc;
-	//double acc2 = 0;
-	
+	param_t *params = (param_t *)arg;
+	int ini = params->ini;
+	int end = params->end;
+
 	for (l = 0; l < max_iters; l++)
 	{
 		acc = 0;
-		for (i = its; i < p; i = i + n_threads)
+		for (i = ini; i < end; i++)
 		{
 			Y[i] = Y[i] + a * X[i];
 			acc += Y[i];
 		}
 		sem_wait(&mutex);
-		Y_avgs[l] += acc / p;	
+		Y_avgs[l] += acc / p;
 		sem_post(&mutex);
 	}
 	return NULL;
 }
+
 void *oneThreads(void *arg)
 {
-	char *var1 = "0";
+	param_t param1;
+	param1.ini = 0;
+	param1.end = p / 1;
 	pthread_t h1;
-	pthread_create(&h1, NULL, calcular, (void *)var1);
+	pthread_create(&h1, NULL, calcular, &param1);
 	pthread_join(h1, NULL);
 	return NULL;
 }
 
 void *twoThreads(void *arg)
 {
-	char *var1 = "0";
-	char *var2 = "1";
+	param_t param1;
+	param1.ini = 0;
+	param1.end = p / 2;
+	param_t param2;
+	param2.ini = p / 2;
+	param2.end = p;
 	pthread_t h1;
 	pthread_t h2;
-	pthread_create(&h1, NULL, calcular, (void *)var1);
-	pthread_create(&h2, NULL, calcular, (void *)var2);
+	pthread_create(&h1, NULL, calcular, &param1);
+	pthread_create(&h2, NULL, calcular, &param2);
 	pthread_join(h1, NULL);
 	pthread_join(h2, NULL);
 	return NULL;
@@ -84,18 +97,26 @@ void *twoThreads(void *arg)
 
 void *fourThreads(void *arg)
 {
-	char *var1 = "0";
-	char *var2 = "1";
-	char *var3 = "2";
-	char *var4 = "3";
+	param_t param1;
+	param1.ini = 0;
+	param1.end = p / 4;
+	param_t param2;
+	param2.ini = p / 4;
+	param2.end = p / 2;
+	param_t param3;
+	param3.ini = p / 2;
+	param3.end = p * 3 / 4;
+	param_t param4;
+	param4.ini = p * 3 / 4;
+	param4.end = p;
 	pthread_t h1;
 	pthread_t h2;
 	pthread_t h3;
 	pthread_t h4;
-	pthread_create(&h1, NULL, calcular, (void *)var1);
-	pthread_create(&h2, NULL, calcular, (void *)var2);
-	pthread_create(&h3, NULL, calcular, (void *)var3);
-	pthread_create(&h4, NULL, calcular, (void *)var4);
+	pthread_create(&h1, NULL, calcular, &param1);
+	pthread_create(&h2, NULL, calcular, &param2);
+	pthread_create(&h3, NULL, calcular, &param3);
+	pthread_create(&h4, NULL, calcular, &param4);
 	pthread_join(h1, NULL);
 	pthread_join(h2, NULL);
 	pthread_join(h3, NULL);
@@ -105,14 +126,30 @@ void *fourThreads(void *arg)
 
 void *eightThreads(void *arg)
 {
-	char *var1 = "0";
-	char *var2 = "1";
-	char *var3 = "2";
-	char *var4 = "3";
-	char *var5 = "4";
-	char *var6 = "5";
-	char *var7 = "6";
-	char *var8 = "7";
+	param_t param1;
+	param1.ini = 0;
+	param1.end = p / 8;
+	param_t param2;
+	param2.ini = p / 8;
+	param2.end = p / 4;
+	param_t param3;
+	param3.ini = p / 4;
+	param3.end = p * 3 / 8;
+	param_t param4;
+	param4.ini = p * 3 / 8;
+	param4.end = p / 2;
+	param_t param5;
+	param5.ini = p / 2;
+	param5.end = p * 5 / 8;
+	param_t param6;
+	param6.ini = p * 5 / 8;
+	param6.end = p * 6 / 8;
+	param_t param7;
+	param7.ini = p * 6 / 8;
+	param7.end = p * 7 / 8;
+	param_t param8;
+	param8.ini = p * 7 / 8;
+	param8.end = p;
 	pthread_t h1;
 	pthread_t h2;
 	pthread_t h3;
@@ -121,14 +158,14 @@ void *eightThreads(void *arg)
 	pthread_t h6;
 	pthread_t h7;
 	pthread_t h8;
-	pthread_create(&h1, NULL, calcular, (void *)var1);
-	pthread_create(&h2, NULL, calcular, (void *)var2);
-	pthread_create(&h3, NULL, calcular, (void *)var3);
-	pthread_create(&h4, NULL, calcular, (void *)var4);
-	pthread_create(&h5, NULL, calcular, (void *)var5);
-	pthread_create(&h6, NULL, calcular, (void *)var6);
-	pthread_create(&h7, NULL, calcular, (void *)var7);
-	pthread_create(&h8, NULL, calcular, (void *)var8);
+	pthread_create(&h1, NULL, calcular, &param1);
+	pthread_create(&h2, NULL, calcular, &param2);
+	pthread_create(&h3, NULL, calcular, &param3);
+	pthread_create(&h4, NULL, calcular, &param4);
+	pthread_create(&h5, NULL, calcular, &param5);
+	pthread_create(&h6, NULL, calcular, &param6);
+	pthread_create(&h7, NULL, calcular, &param7);
+	pthread_create(&h8, NULL, calcular, &param8);
 	pthread_join(h1, NULL);
 	pthread_join(h2, NULL);
 	pthread_join(h3, NULL);
