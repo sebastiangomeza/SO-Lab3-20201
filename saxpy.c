@@ -23,7 +23,7 @@
 // Variables to obtain command line parameters
 unsigned int seed = 1;
 int p = 10000000;
-int n_threads = 8;
+int n_threads = 1;
 int max_iters = 1000;
 // Variables to perform SAXPY operation
 double *X;
